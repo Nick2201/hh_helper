@@ -13,7 +13,8 @@ import time
 #     one = ETL_vac_page(page)
 #     one.extract(**additional_params)
 #     one.transform()
-# select_query = select([table_vacancy.columns.id])
+#     one.load()
+
 select_query=select(table_vac_page)
 with engine.connect() as connection:
     result = connection.execute(select_query).fetchall()
@@ -30,23 +31,26 @@ for i in id_values:
         one_vac.transform()
         one_vac.load()
     except Exception as ex:
-        aller.append(
-            (one_vac.data_extracted.get('id'),
-            ex)
-            )
+
+        # aller.append(
+        #     (one_vac.data_extracted.get('id'),
+        #     ex)
+        #     )
         er_list.append(one_vac.data_extracted.get('id'))
-# print(one.data_extracted)
-# print(one.data_transformed)
-# one.load()
+# # print(one.data_extracted)
+# # print(one.data_transformed)
+# # one.load()
+print('######################################'+' , '.join(er_list)+'###############################################')
 
 
-# select_query = select([table_vacancy.columns.id])
-print(f'################################{aller}########################')
-print(f'#########{er_list}#########')
-# one = ETL_One_vac(vac_id=str('83811478'))
+# # select_query = select([table_vacancy.columns.id])
+# print(f'################################{aller}########################')
+# print(f'#########{er_list}#########')
+# one = ETL_One_vac(vac_id=str('83360577'))
 # one.extract()
 # one.transform()
-# print(one.data_transformed)
+# print(one.data_extracted)
+# # print(one.data_transformed)
 # one.load()
 
 

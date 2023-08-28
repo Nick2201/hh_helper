@@ -92,8 +92,9 @@ class ETL_vac_page:
             try:
                 row_ = table_vac_page.insert().values(**vac)
                 conn.execute(row_)
-                # print(f"{_row['cik']} is")
                 conn.commit()
+                # print(f"{_row['cik']} is")
+
             except:
                 pass
 

@@ -83,10 +83,14 @@ class ETL_One_vac:
             type_name = type_info.get('name', '')
 
         key_skills = data_dict.get('key_skills', [])
+
+
         if key_skills is None:
             skills = None
         else:
-            skills = ' '.join([skill for skill in key_skills])
+            skills = ' '.join([skill['name'] for skill in key_skills])
+            # print(key_skills)
+
 
         date_pub= data_dict.get("published_at",'')
         date_create = data_dict.get("created_at",'')
