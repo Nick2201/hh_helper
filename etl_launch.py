@@ -6,16 +6,22 @@ from sqlalchemy import Table
 from sqlalchemy.sql import select
 import time
 
-# for page in range(0,25):
-#     additional_params = {
-#     'experience': 'noExperience',
-# }
-#     one = ETL_vac_page(page)
-#     one.extract(**additional_params)
-#     one.transform()
-#     one.load()
+for page in range(0,25):
+    additional_params = {
+    'experience': 'noExperience',
+}
+    one = ETL_vac_page(page)
+    one.extract(**additional_params,filter_text='NAME:analyst')
+    one.transform()
+    one.load()
 
-select_query=select(table_vac_page)
+# select_query=select(table_vac_page)
+from sqlalchemy import text
+select_query = text('''
+SELECT *
+FROM vac_page
+WHERE date >= CURRENT_DATE;
+''')
 with engine.connect() as connection:
     result = connection.execute(select_query).fetchall()
 
@@ -25,17 +31,18 @@ id_values = [row[0] for row in result]
 er_list = []
 aller = []
 for i in id_values:
+    one_vac = ETL_One_vac(vac_id=i)
     try:
-        one_vac = ETL_One_vac(vac_id=i)
+
         one_vac.extract()
         one_vac.transform()
         one_vac.load()
     except Exception as ex:
-
-        # aller.append(
-        #     (one_vac.data_extracted.get('id'),
-        #     ex)
-        #     )
+        pass
+        aller.append(
+            (one_vac.data_extracted.get('id'),
+            ex)
+            )
         er_list.append(one_vac.data_extracted.get('id'))
 # # print(one.data_extracted)
 # # print(one.data_transformed)

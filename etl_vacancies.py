@@ -5,10 +5,13 @@ from datetime import datetime
 
 
 class ETL_vac_page:
-    def __init__(self,page:int=0):
+    def __init__(self,
+        page:int=0,
+        data_extracted: dict={},
+        data_transformed: dict={}):
         self.page               = page # str('83811478')
-        self.data_extracted     = None
-        self.data_transformed   = None
+        self.data_extracted     = data_extracted
+        self.data_transformed   = data_transformed
     def extract(self,
         filter_text :str =  'NAME:Аналитик',
         **params_add
@@ -41,62 +44,65 @@ class ETL_vac_page:
         # data = [...]  # The list of dictionaries from your JSON
 
         data_transformed = []
-        for item in self.data_extracted['items']:
-            salary = item.get('salary', {})
+        try:
+            for item in self.data_extracted['items']:
+                salary = item.get('salary', {})
 
-            if salary is None:
-                salary_from = 0
-                salary_to = 0
-                salary_currency = 'RUR'
-                salary_gross = False
-            else:
-                salary_from = salary.get('from', 0)
-                salary_to = salary.get('to', 0)
-                salary_currency = salary.get('currency', 'RUR')
-                salary_gross = salary.get('gross', False)
+                if salary is None:
+                    salary_from = 0
+                    salary_to = 0
+                    salary_currency = 'RUR'
+                    salary_gross = False
+                else:
+                    salary_from = salary.get('from', 0)
+                    salary_to = salary.get('to', 0)
+                    salary_currency = salary.get('currency', 'RUR')
+                    salary_gross = salary.get('gross', False)
 
-            snippet = item.get('snippet', {})
-            requirement = snippet.get('requirement', '')
-            responsibility = snippet.get('responsibility', '')
+                snippet = item.get('snippet', {})
+                requirement = snippet.get('requirement', '')
+                responsibility = snippet.get('responsibility', '')
 
-            employer = item.get('employer', {})
-            employer_name = employer.get('name', '')
+                employer = item.get('employer', {})
+                employer_name = employer.get('name', '')
 
-            experience = item.get('experience', {})
-            experience_id = experience.get('id', '')
-            experience_name = experience.get('name', '')
+                experience = item.get('experience', {})
+                experience_id = experience.get('id', '')
+                experience_name = experience.get('name', '')
 
-            area = item.get('area', {})
-            area_name = area.get('name', '')
+                area = item.get('area', {})
+                area_name = area.get('name', '')
 
-            data_transformed.append({
-                'id': item.get('id', ''),
-                'name': item.get('name', ''),
-                'area_name': area_name,
-                'salary_from': salary_from,
-                'salary_to': salary_to,
-                'salary_currency': salary_currency,
-                'salary_gross': salary_gross,
-                'requirement': requirement,
-                'responsibility': responsibility,
-                'employer_name': employer_name,
-                'experience_id': experience_id,
-                'experience_name': experience_name,
-                'date'              : datetime.utcnow()
-            })
-        self.data_transformed = data_transformed
-        return self
+                data_transformed.append({
+                    'id': item.get('id', ''),
+                    'name': item.get('name', ''),
+                    'area_name': area_name,
+                    'salary_from': salary_from,
+                    'salary_to': salary_to,
+                    'salary_currency': salary_currency,
+                    'salary_gross': salary_gross,
+                    'requirement': requirement,
+                    'responsibility': responsibility,
+                    'employer_name': employer_name,
+                    'experience_id': experience_id,
+                    'experience_name': experience_name,
+                    'date'              : datetime.utcnow()
+                })
+            self.data_transformed = data_transformed
+            return self
+        finally:
+            print(f"вакансий: {data_transformed}")
     def load(self):
         conn = engine.connect()
         for vac in self.data_transformed:
             try:
                 row_ = table_vac_page.insert().values(**vac)
                 conn.execute(row_)
+                print(row_)
                 conn.commit()
                 # print(f"{_row['cik']} is")
-
             except:
-                pass
+                print(**vac)
 
 
 

@@ -6,7 +6,8 @@ with vac_table as (select
 	vacancy.description,key_skills,
 	concat(key_skills,requirement,responsibility,description) as skills,
 	case when salary_gross is true then salary_from * 0.87 else salary_from end sal_from,
-	case when salary_gross is true then salary_to * 0.87 else salary_from end sal_to
+	case when salary_gross is true then salary_to * 0.87 else salary_from end sal_to,
+	vp."date"
 from hh_helper.public.vac_page vp
 	join vacancy ON vacancy.id = vp.id
 where
@@ -23,7 +24,8 @@ where
 	requirement NOT LIKE '%студент:%' AND
 	requirement NOT LIKE '%от 2-х лет%' AND
 	requirement NOT LIKE '%от 2%' AND
-	requirement NOT LIKE '%от 3%')
+	requirement NOT LIKE '%от 3%' and
+	vp.date >= CURRENT_DATE )
 select
 	link,description,
 	case
@@ -46,7 +48,8 @@ select
     END AS "power-bi",
     CASE
         WHEN skills ILIKE '%статист%' THEN True ELSE false END AS "statistics",
-	key_skills
+	key_skills,
+	vac_table."date"
 from vac_table
   where sal_from < 80000 OR sal_from IS NULL
 order by

@@ -132,11 +132,11 @@ class ETL_One_vac:
         print("load successfull")
         return self
 
-# one = ETL_One_vac(vac_id=str('83811478'))
-# one.extract()
-# one.transform()
-# print(one.data_transformed)
-# one.load()
+one = ETL_One_vac(vac_id=str('88002524'))
+one.extract()
+one.transform()
+print(one.data_transformed)
+
 
 
 
